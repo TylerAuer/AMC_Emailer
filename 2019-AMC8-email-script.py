@@ -10,6 +10,9 @@ Known Bugs:
     - Solution: Look in sent mail, delete up to last sent email in CSV file
 """
 
+# TODO: Make it so sending each email is not a separate login
+# TODO: Get a non-personal email
+
 #!/usr/bin/env python
 
 import smtplib
@@ -40,10 +43,11 @@ def amcAnswers(studentData):
     Generates a string with:
     the question #,the student's answer, and the correct answer
     """
-    #A list of the correct answers
-    # correctAnswers = ('A','D','D','C','E','C','B','C','B',
-                      'C','C','B','A','D','D','C','A','E',
-                      'C','A','E','B','D','C','E')
+    # A list of the correct answers
+    # Updated for 2019 test
+    correctAnswers = ('D','E','E','D','B','C','A','E','B',
+                      'B','D','A','A','C','B','D','B','C',
+                      'C','D','E','E','B','B','C')
     finalString = ('Below you can see how you answered each question. '
                    'The correct answer is in parentheses. '
                    'A period represents a question you left blank.\n\n')
@@ -82,8 +86,8 @@ def amcBody(studentData):
                    "get 11 or more questions right. \n\n"
 
                    "Regardless of your score, you should be proud "
-                   "that you took on the challenge of a really difficulty "
-                   "8th grade test. We encourage you to revisit the questions "
+                   "that you took on the challenge of a really difficult "
+                   "test. We encourage you to revisit the questions "
                    "using the link below.\n\n")
 
     bodyString += 'Your score was: %s.\n\n' % studentData[scoreIndex]
@@ -99,10 +103,10 @@ def amcBody(studentData):
 
 def sendEmail(recipient, subject, body):
     """
-    Sends an email from Tyler's st-andrews.org account
+    Sends an email from custom st-andrews.org account
     Expects strings for all .............
     """
-    fromaddr = "tauer@st-andrews.org"
+    fromaddr = "AMC.Robot.Boop.Beep@st-andrews.org"
     toaddr = recipient
     msg = MIMEMultipart()
     msg['From'] = fromaddr
@@ -114,10 +118,8 @@ def sendEmail(recipient, subject, body):
      
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    # Because of 2-step verification, needed a special password
-    # I got this special code (see next uncommented line of code) from App Passwords page on google:
-    # Link: https://support.google.com/accounts/answer/185833
-    server.login(fromaddr, " ") # Special login code here
+    # Will need to allow unsafe apps in Google interface
+    server.login(fromaddr, raw_input("Enter password : ")) # Special login code here
     text = msg.as_string()
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
