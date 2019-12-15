@@ -1,19 +1,12 @@
 #!/usr/bin/env python
-# AMC Emailer
-# Sends emails with AMC results to students
 
 """
-This program takes a CSV file and uses it to send AMC results to the MS.
+This program takes a CSV file and uses it to send AMC results to students in the Middle School.
 
 Known Bugs:
 - Maximum logins gets exceeded and then you have to restart
     - Solution: Look in sent mail, delete up to last sent email in CSV file
 """
-
-# TODO: Make it so sending each email is not a separate login
-# TODO: Get a non-personal email
-
-#!/usr/bin/env python
 
 import smtplib
 import csv
@@ -22,7 +15,7 @@ from email.MIMEText import MIMEText
 
 ###
 ### MUST REMOVE HEADER ROW!
-csvData = '/Users/teacher/desktop/AMC/8.csv' # Test file
+csvData = 'sample-data.csv' # Test file
 # csvData = '/Users/teacher/desktop/AMC/results.csv' #Real file
 
 # Makes a blank list to hold data
@@ -35,8 +28,6 @@ with open(csvData, 'rb') as csvfile:
         # adds row to data
         data.append(row)
 
-#Subject of the emails
-subject = 'Your Personalized AMC Results'
 
 def amcAnswers(studentData):
     """
@@ -69,7 +60,6 @@ def amcBody(studentData):
     """
     #References for the data CSV (columns)
     nicknameIndex = 3
-    emailIndex = 2
     scoreIndex = 1
     
     bodyString = 'Dear %s,\n\n' % studentData[nicknameIndex]
@@ -101,6 +91,8 @@ def amcBody(studentData):
     
     return bodyString
 
+'''
+OLD Function
 def sendEmail(recipient, subject, body):
     """
     Sends an email from custom st-andrews.org account
@@ -123,6 +115,32 @@ def sendEmail(recipient, subject, body):
     text = msg.as_string()
     server.sendmail(fromaddr, toaddr, text)
     server.quit()
+'''
 
-for row in data:
-    sendEmail(str(row[2]), "AMC 8 Results", amcBody(row))
+def sendEmails():
+    
+    # Sets up the connection to the mail server
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    fromaddr = "AMC.Robot.Boop.Beep@st-andrews.org"
+    password = raw_input("Enter password : ")
+    # Need to enable unsafe applications or username, password combo will be rejected
+    # Recommended that you use a throwaway email address (not your personal or work email address)
+    # that way you aren't exposing your personal data
+    server.login(fromaddr, password) 
+
+    # Generates and sends an email for each student
+    for row in data[1:]:
+        print row
+        toaddr = row[2]
+        msg = MIMEMultipart()
+        msg['From'] = fromaddr
+        msg['To'] = toaddr
+        msg['Subject'] = 'Your AMC Results'
+        msg.attach(MIMEText(amcBody(row), 'plain'))
+        server.sendmail(fromaddr, toaddr, msg.as_string())
+
+    # Closes session on server
+    server.quit()
+
+sendEmails()
