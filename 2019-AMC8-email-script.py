@@ -3,9 +3,7 @@
 """
 This program takes a CSV file and uses it to send AMC results to students in the Middle School.
 
-Known Bugs:
-- Maximum logins gets exceeded and then you have to restart
-    - Solution: Look in sent mail, delete up to last sent email in CSV file
+See sample-data.csv for an example of the expected format of the csv
 """
 
 import smtplib
@@ -13,29 +11,22 @@ import csv
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-###
-### MUST REMOVE HEADER ROW!
-csvData = 'sample-data.csv' # Test file
-# csvData = '/Users/teacher/desktop/AMC/results.csv' #Real file
+# File containing students data (including emails)
+csvData = 'sample-data.csv'
 
-# Makes a blank list to hold data
+# Opens csv file and adds row of CSV data as list within data
 data = []
-
-# Opens csv file and adds row of CSV data as list within list
 with open(csvData, 'rb') as csvfile:
     csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in csvreader:
-        # adds row to data
         data.append(row)
-
 
 def amcAnswers(studentData):
     """
     Generates a string with:
-    the question #,the student's answer, and the correct answer
+    the question #, the student's answer, and the correct answer
     """
-    # A list of the correct answers
-    # Updated for 2019 test
+    # A list of the correct answers (updated for 2019 test)
     correctAnswers = ('D','E','E','D','B','C','A','E','B',
                       'B','D','A','A','C','B','D','B','C',
                       'C','D','E','E','B','B','C')
@@ -43,7 +34,7 @@ def amcAnswers(studentData):
                    'The correct answer is in parentheses. '
                    'A period represents a question you left blank.\n\n')
     
-    # The first column with a question
+    # The first column in csv with a question
     questionStartIndex = 7
 
     questionNumber = 1
@@ -87,35 +78,9 @@ def amcBody(studentData):
     bodyString += ("You can see the original questions and the answers "
                    "with this link: https://artofproblemsolving.com/wiki/index.php/2018_AMC_8_Problems. \n\n")
 
-    bodyString += "Please email Mr. Auer if you have any questions.\n"
+    bodyString += "Please email Mr. Auer (TAuer@st-andrews.org) if you have any questions.\n"
     
     return bodyString
-
-'''
-OLD Function
-def sendEmail(recipient, subject, body):
-    """
-    Sends an email from custom st-andrews.org account
-    Expects strings for all .............
-    """
-    fromaddr = "AMC.Robot.Boop.Beep@st-andrews.org"
-    toaddr = recipient
-    msg = MIMEMultipart()
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    msg['Subject'] = subject
-     
-    body = body
-    msg.attach(MIMEText(body, 'plain'))
-     
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    # Will need to allow unsafe apps in Google interface
-    server.login(fromaddr, raw_input("Enter password : ")) # Special login code here
-    text = msg.as_string()
-    server.sendmail(fromaddr, toaddr, text)
-    server.quit()
-'''
 
 def sendEmails():
     
@@ -136,7 +101,7 @@ def sendEmails():
         msg = MIMEMultipart()
         msg['From'] = fromaddr
         msg['To'] = toaddr
-        msg['Subject'] = 'Your AMC Results'
+        msg['Subject'] = 'AMC Results'
         msg.attach(MIMEText(amcBody(row), 'plain'))
         server.sendmail(fromaddr, toaddr, msg.as_string())
 
