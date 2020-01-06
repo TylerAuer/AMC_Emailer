@@ -21,41 +21,44 @@ with open(csvData, 'rb') as csvfile:
     for row in csvreader:
         data.append(row)
 
+
 def amcAnswers(studentData):
     """
     Generates a string with:
     the question #, the student's answer, and the correct answer
     """
     # A list of the correct answers (updated for 2019 test)
-    correctAnswers = ('D','E','E','D','B','C','A','E','B',
-                      'B','D','A','A','C','B','D','B','C',
-                      'C','D','E','E','B','B','C')
+    correctAnswers = ('D', 'E', 'E', 'D', 'B', 'C', 'A', 'E', 'B',
+                      'B', 'D', 'A', 'A', 'C', 'B', 'D', 'B', 'C',
+                      'C', 'D', 'E', 'E', 'B', 'B', 'C')
     finalString = ('Below you can see how you answered each question. '
                    'The correct answer is in parentheses. '
                    'A period represents a question you left blank.\n\n')
-    
+
     # The first column in csv with a question
     questionStartIndex = 7
 
     questionNumber = 1
     for answer in studentData[questionStartIndex:]:
-        finalString += "%s) %s (%s)\n" % (questionNumber, answer, correctAnswers[questionNumber - 1])
+        finalString += "%s) %s (%s)\n" % (questionNumber,
+                                          answer, correctAnswers[questionNumber - 1])
         questionNumber += 1
 
     finalString += "\n"
     return finalString
-                                          
+
+
 def amcBody(studentData):
     """
     Creates the body of an email with each student's AMC results and answers
     """
-    #References for the data CSV (columns)
+    # References for the data CSV (columns)
     nicknameIndex = 3
     scoreIndex = 1
-    
+
     bodyString = 'Dear %s,\n\n' % studentData[nicknameIndex]
     bodyString += ("This automated email contains your results for the AMC 8. \n\n"
-    
+
                    "The AMC 8 is not graded like a normal test "
                    "because it is much harder. There aren't letter grades"
                    " and you don't get a percentage score. Instead, your score "
@@ -76,14 +79,15 @@ def amcBody(studentData):
     bodyString += amcAnswers(studentData)
 
     bodyString += ("You can see the original questions and the answers "
-                   "with this link: https://artofproblemsolving.com/wiki/index.php/2018_AMC_8_Problems. \n\n")
+                   "with this link: https://artofproblemsolving.com/wiki/index.php/2019_AMC_8_Problems. \n\n")
 
     bodyString += "Please email Mr. Auer (TAuer@st-andrews.org) if you have any questions.\n"
-    
+
     return bodyString
 
+
 def sendEmails():
-    
+
     # Sets up the connection to the mail server
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
@@ -92,7 +96,7 @@ def sendEmails():
     # Need to enable unsafe applications or username, password combo will be rejected
     # Recommended that you use a throwaway email address (not your personal or work email address)
     # that way you aren't exposing your personal data
-    server.login(fromaddr, password) 
+    server.login(fromaddr, password)
 
     # Generates and sends an email for each student
     for row in data[1:]:
@@ -107,5 +111,6 @@ def sendEmails():
 
     # Closes session on server
     server.quit()
+
 
 sendEmails()
